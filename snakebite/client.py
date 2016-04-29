@@ -30,7 +30,7 @@ from snakebite.errors import (
     FatalException, TransientException)
 from snakebite.namenode import Namenode
 from snakebite.service import RpcService
-from snakebite.compat import range
+from snakebite.compat import range, unicode
 
 import Queue
 import zlib
