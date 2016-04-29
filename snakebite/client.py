@@ -1391,7 +1391,7 @@ class HAClient(Client):
             # is not.
             raise InvalidInputException("List of namenodes is empty - couldn't create the client")
         self.namenode = self._switch_namenode(namenodes)
-        self.namenode.next()
+        next(self.namenode)
 
     def _switch_namenode(self, namenodes):
         for namenode in namenodes:
@@ -1418,7 +1418,7 @@ class HAClient(Client):
         else:
             # There's a valid NN in active state, but there's still request error - raise
             raise
-        self.namenode.next()
+        next(self.namenode)
 
     def __handle_socket_error(self, exception):
         log.debug("Request failed with %s" % exception)
@@ -1430,7 +1430,7 @@ class HAClient(Client):
             pass
         else:
             raise
-        self.namenode.next()
+        next(self.namenode)
 
     @staticmethod
     def _ha_return_method(func):
@@ -1453,7 +1453,7 @@ class HAClient(Client):
                 try:
                     results = func(self, *args, **kw)
                     while(True): # yield all results
-                        yield results.next()
+                        yield next(results)
                 except RequestError as e:
                     self.__handle_request_error(e)
                 except socket.error as e:
