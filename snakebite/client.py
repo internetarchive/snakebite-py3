@@ -30,7 +30,7 @@ from snakebite.errors import (
     FatalException, TransientException)
 from snakebite.namenode import Namenode
 from snakebite.service import RpcService
-from snakebite.compat import long, range
+from snakebite.compat import range
 
 import Queue
 import zlib
@@ -1092,7 +1092,7 @@ class Client(object):
         if tail_only:  # Only read last part, default is 1KB
             request.offset = max(0, length - tail_length)
         else:
-            request.offset = long(0)
+            request.offset = int(0)
 
         response = self.service.getBlockLocations(request)
 
