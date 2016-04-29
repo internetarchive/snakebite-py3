@@ -30,6 +30,7 @@ from snakebite.errors import (
     FatalException, TransientException)
 from snakebite.namenode import Namenode
 from snakebite.service import RpcService
+from snakebite.compat import long, range
 
 import Queue
 import zlib
@@ -46,8 +47,6 @@ import time
 import re
 import sys
 
-if sys.version_info[0] == 3:
-    long = int
 
 log = logging.getLogger(__name__)
 
