@@ -56,6 +56,7 @@ from snakebite.platformutils import get_current_username
 from snakebite.formatter import format_bytes
 from snakebite.errors import RequestError, TransientException, FatalException
 from snakebite.crc32c import crc
+from snakebite.compat import range
 
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
@@ -131,7 +132,7 @@ class RpcBufferedReader(object):
 
     def _buffer_bytes(self, n):
         to_read = n
-        for _ in xrange(self.MAX_READ_ATTEMPTS):
+        for _ in range(self.MAX_READ_ATTEMPTS):
             bytes_read = self.socket.recv(to_read)
             self.buffer += bytes_read
             to_read -= len(bytes_read)
@@ -613,7 +614,7 @@ class DataXceiverChannel(object):
                 # Collect checksums
                 if check_crc and checksum_type != self.CHECKSUM_NULL:
                     checksums = []
-                    for _ in xrange(0, chunks_per_packet):
+                    for _ in range(0, chunks_per_packet):
                         checksum = self._read_bytes(checksum_len)
                         checksum = struct.unpack("!I", checksum)[0]
                         checksums.append(checksum)
