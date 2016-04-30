@@ -32,7 +32,11 @@ from snakebite.namenode import Namenode
 from snakebite.service import RpcService
 from snakebite.compat import range, unicode
 
-import Queue
+try:
+    from Queue import PriorityQueue
+except ImportError:
+    from queue import PriorityQueue
+
 import zlib
 import bz2
 import logging
@@ -1122,7 +1126,7 @@ class Client(object):
                     offset_in_block = max(0, lastblock.b.numBytes - tail_length)
 
             # Prioritize locations to read from
-            locations_queue = Queue.PriorityQueue()  # Primitive queuing based on a node's past failure
+            locations_queue = PriorityQueue()  # Primitive queuing based on a node's past failure
             for location in block.locs:
                 if location.id.storageID in failed_nodes:
                     locations_queue.put((1, location))  # Priority num, data
