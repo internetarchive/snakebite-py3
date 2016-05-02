@@ -17,6 +17,7 @@ import subprocess
 import select
 import re
 import datetime
+from snakebite.compat import long
 
 
 class MiniCluster(object):
