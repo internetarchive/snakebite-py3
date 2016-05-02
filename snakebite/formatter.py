@@ -90,7 +90,7 @@ def format_listing(listing, json_output=False, human_readable=False, recursive=F
         last_dir = None
         try:
             while True:
-                node = listing.next()
+                node = next(listing)
                 dir_name = os.path.dirname(node['path'])
                 if dir_name != last_dir:
                     if last_dir:
@@ -204,7 +204,7 @@ def format_du(listing, json_output=False, human_readable=False):
         last_dir = None
         try:
             while True:
-                node = listing.next()
+                node = next(listing)
                 dir_name = os.path.dirname(node['path'])
                 if dir_name != last_dir:
                     if last_dir:
