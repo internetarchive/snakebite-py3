@@ -13,7 +13,8 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-from minicluster_testbase import MiniClusterTestBase
+from snakebite.compat import range
+from test.minicluster_testbase import MiniClusterTestBase
 import os
 import random
 
@@ -63,7 +64,7 @@ class TailTest(MiniClusterTestBase):
         f = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'testfiles', 'test3'))
 
         p = self.cluster.put_subprocess('-', path)
-        for _ in xrange(131072):  # 1024 * 131072 = 134,217,728 (default block size)
+        for _ in range(131072):  # 1024 * 131072 = 134,217,728 (default block size)
             f.seek(0)
             for line in f.readlines():
                 print >> p.stdin, line
