@@ -57,13 +57,12 @@ from snakebite.formatter import format_bytes
 from snakebite.errors import RequestError, TransientException, FatalException
 from snakebite.crc32c import crc
 from snakebite.compat import range
+from snakebite import logger
 
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
 # Module imports
-
-import logger
 import logging
 import struct
 import uuid
@@ -163,7 +162,7 @@ class RpcBufferedReader(object):
 
 
 class SocketRpcChannel(RpcChannel):
-    ERROR_BYTES = 18446744073709551615L
+    ERROR_BYTES = 18446744073709551615
     RPC_HEADER = "hrpc"
     RPC_SERVICE_CLASS = 0x00
     AUTH_PROTOCOL_NONE = 0x00
