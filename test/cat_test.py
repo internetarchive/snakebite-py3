@@ -13,8 +13,10 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-from minicluster_testbase import MiniClusterTestBase
 import os
+
+from snakebite.compat import range
+from test.minicluster_testbase import MiniClusterTestBase
 
 
 class CatTest(MiniClusterTestBase):
@@ -75,7 +77,7 @@ class CatTest(MiniClusterTestBase):
         testfiles_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "testfiles")
         f = open(''.join([testfiles_path, testfile]))
         p = self.cluster.put_subprocess('-', dst, block_size)
-        for _ in xrange(times):
+        for _ in range(times):
             f.seek(0)
             for line in f.readlines():
                 print >> p.stdin, line
