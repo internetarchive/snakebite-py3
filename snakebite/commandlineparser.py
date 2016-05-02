@@ -59,11 +59,11 @@ def exitError(exc_info):
 
 def command(args="", descr="", allowed_opts="", visible=True):
     def wrap(f):
-        Commands.methods[f.func_name] = {"method": f,
-                                         "args": args,
-                                         "descr": descr,
-                                         "allowed_opts": allowed_opts,
-                                         "visible": visible}
+        Commands.methods[f.__name__] = {"method": f,
+                                        "args": args,
+                                        "descr": descr,
+                                        "allowed_opts": allowed_opts,
+                                        "visible": visible}
     return wrap
 
 
@@ -463,12 +463,12 @@ class CommandLineParser(object):
 
     def command(args="", descr="", allowed_opts="", visible=True, req_args=None):
         def wrap(f):
-            Commands.methods[f.func_name] = {"method": f,
-                                             "args": args,
-                                             "descr": descr,
-                                             "allowed_opts": allowed_opts,
-                                             "visible": visible,
-                                             "req_args": req_args}
+            Commands.methods[f.__name__] = {"method": f,
+                                            "args": args,
+                                            "descr": descr,
+                                            "allowed_opts": allowed_opts,
+                                            "visible": visible,
+                                            "req_args": req_args}
         return wrap
 
     @command(visible=False)
