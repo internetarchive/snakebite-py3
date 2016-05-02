@@ -32,6 +32,9 @@ Authors: Martin Norbury (mnorbury@lcogt.net)
 May 2009
 '''
 
+# python 3 support
+from __future__ import absolute_import, print_function, division
+
 # Standard library imports
 import logging
 

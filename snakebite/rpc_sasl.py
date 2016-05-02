@@ -30,6 +30,9 @@ Bolke de Bruin (bolke@xs4all.nl)
 
 '''
 
+# python 3 support
+from __future__ import absolute_import, print_function, division
+
 import struct
 import sasl
 import re

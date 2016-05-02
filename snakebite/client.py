@@ -13,6 +13,9 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
+# python 3 support
+from __future__ import absolute_import, print_function, division
+
 import snakebite.protobuf.ClientNamenodeProtocol_pb2 as client_proto
 import snakebite.glob as glob
 from snakebite.platformutils import get_current_username

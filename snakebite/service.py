@@ -13,6 +13,9 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
+# python 3 support
+from __future__ import absolute_import, print_function, division
+
 from snakebite.channel import SocketRpcChannel
 import google.protobuf.service as service
 

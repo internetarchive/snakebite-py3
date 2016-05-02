@@ -1,3 +1,6 @@
+# python 3 support
+from __future__ import absolute_import, print_function, division
+
 from sys import version_info
 py_2 = version_info[0] < 3
 

@@ -24,6 +24,9 @@ pycrc 0.7.1 (http://www.tty1.net/pycrc/). Command line used:
 './pycrc.py --model=crc-32c --generate c --algorithm=table-driven'
 """
 
+# python 3 support
+from __future__ import absolute_import, print_function, division
+
 
 import array
 
