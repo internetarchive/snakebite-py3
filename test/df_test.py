@@ -15,8 +15,8 @@
 import re
 import unittest2
 
-from minicluster_testbase import MiniClusterTestBase
-
+from test.minicluster_testbase import MiniClusterTestBase
+from snakebite.compat import long
 from snakebite.formatter import format_fs_stats
 
 class DfTest(MiniClusterTestBase):
