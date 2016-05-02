@@ -171,9 +171,9 @@ class CommandLineParser(object):
     def __init__(self):
         usage = "snakebite [general options] cmd [arguments]"
         epilog = "\ngeneral options:\n"
-        epilog += "\n".join(sorted(["  %-30s %s" % ("%s %s" % (v['short'], v['long']), v['help']) for k, v in self.GENERIC_OPTS.iteritems()]))
+        epilog += "\n".join(sorted(["  %-30s %s" % ("%s %s" % (v['short'], v['long']), v['help']) for k, v in self.GENERIC_OPTS.items()]))
         epilog += "\n\ncommands:\n"
-        epilog += "\n".join(sorted(["  %-30s %s" % ("%s %s" % (k, v['args']), v['descr']) for k, v in Commands.methods.iteritems() if v['visible']]))
+        epilog += "\n".join(sorted(["  %-30s %s" % ("%s %s" % (k, v['args']), v['descr']) for k, v in Commands.methods.items() if v['visible']]))
         epilog += "\n\nto see command-specific options use: snakebite [cmd] --help"
 
         self.parser = Parser(usage=usage, epilog=epilog, formatter_class=argparse.RawTextHelpFormatter, add_help=False)
@@ -185,7 +185,7 @@ class CommandLineParser(object):
 
     def _build_parent_parser(self):
         #general options
-        for opt_name, opt_data in self.GENERIC_OPTS.iteritems():
+        for opt_name, opt_data in self.GENERIC_OPTS.items():
             if 'action' in opt_data:
                 self.parser.add_argument(opt_data['short'], opt_data['long'], help=opt_data['help'], action=opt_data['action'])
             else:
@@ -199,7 +199,7 @@ class CommandLineParser(object):
 
         #sub-options
         arg_parsers = {}
-        for opt_name, opt_data in self.SUB_OPTS.iteritems():
+        for opt_name, opt_data in self.SUB_OPTS.items():
             arg_parsers[opt_name] = argparse.ArgumentParser(add_help=False)
             arg_parsers[opt_name].add_argument(opt_data['short'], opt_data['long'], help=opt_data['help'],
                                                action=opt_data['action'])
@@ -237,7 +237,7 @@ class CommandLineParser(object):
                                                          type=int)
 
         subparsers = self.parser.add_subparsers()
-        for cmd_name, cmd_info in Commands.methods.iteritems():
+        for cmd_name, cmd_info in Commands.methods.items():
             parents = [arg_parsers[opt] for opt in cmd_info['allowed_opts'] if opt in arg_parsers]
             parents += [subcommand_help_parser]
             if 'req_args' in cmd_info and not cmd_info['req_args'] is None:
@@ -420,7 +420,7 @@ class CommandLineParser(object):
             args = self.parser.parse_args(non_cli_input)
         except ArgumentParserError, error:
             if "-h" in sys.argv or "--help" in sys.argv:  # non cli input?
-                commands = [cmd for (cmd, description) in Commands.methods.iteritems() if description['visible'] is True]
+                commands = [cmd for (cmd, description) in Commands.methods.items() if description['visible'] is True]
                 command = error.prog.split()[-1]
                 if command in commands:
                     self.usage_helper(command)
@@ -473,7 +473,7 @@ class CommandLineParser(object):
 
     @command(visible=False)
     def commands(self):
-        print "\n".join(sorted([k for k, v in Commands.methods.iteritems() if v['visible']]))
+        print "\n".join(sorted([k for k, v in Commands.methods.items() if v['visible']]))
 
     @command(args="[path]", descr="Used for command line completion", visible=False, req_args=['[dirs]'])
     def complete(self):
@@ -639,7 +639,7 @@ class CommandLineParser(object):
         print "usage: snakebite [general options] %s %s" % (command, " ".join(cmd_args))
 
         general_opts = "\ngeneral options:\n"
-        general_opts += "\n".join(sorted(["  %-30s %s" % ("%s %s" % (v['short'], v['long']), v['help']) for k, v in self.GENERIC_OPTS.iteritems()]))
+        general_opts += "\n".join(sorted(["  %-30s %s" % ("%s %s" % (v['short'], v['long']), v['help']) for k, v in self.GENERIC_OPTS.items()]))
         print general_opts
 
         if allowed_opts:
