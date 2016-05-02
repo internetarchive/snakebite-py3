@@ -24,7 +24,7 @@ class ConfigTest(unittest2.TestCase):
 
     def _verify_hdfs_settings(self, config):
         namenodes = config['namenodes']
-        self.assertEquals(len(namenodes), 2)
+        self.assertEqual(len(namenodes), 2)
         # assert first NN
         self.assertEqual('namenode1.mydomain', namenodes[0]['namenode'])
         self.assertEqual(8888, namenodes[0]['port'])
@@ -34,7 +34,7 @@ class ConfigTest(unittest2.TestCase):
 
     def _verify_hdfs_noport_settings(self, config):
         namenodes = config['namenodes']
-        self.assertEquals(len(namenodes), 2)
+        self.assertEqual(len(namenodes), 2)
         # assert first NN
         self.assertEqual('namenode1.mydomain', namenodes[0]['namenode'])
         self.assertEqual(8020, namenodes[0]['port'])
@@ -51,17 +51,17 @@ class ConfigTest(unittest2.TestCase):
         core_site_path = self.get_config_path('ha-core-site.xml')
         config = HDFSConfig.read_core_config(core_site_path)
         namenodes = config['namenodes']
-        self.assertEquals(len(namenodes), 1)
-        self.assertEquals('testha', namenodes[0]['namenode'])
-        self.assertEquals(8020, namenodes[0]['port'])
+        self.assertEqual(len(namenodes), 1)
+        self.assertEqual('testha', namenodes[0]['namenode'])
+        self.assertEqual(8020, namenodes[0]['port'])
 
     def test_read_core_config_emr(self):
         core_site_path = self.get_config_path('emr-core-site.xml')
         config = HDFSConfig.read_core_config(core_site_path)
         namenodes = config['namenodes']
-        self.assertEquals(len(namenodes), 1)
-        self.assertEquals('testha', namenodes[0]['namenode'])
-        self.assertEquals(8020, namenodes[0]['port'])
+        self.assertEqual(len(namenodes), 1)
+        self.assertEqual('testha', namenodes[0]['namenode'])
+        self.assertEqual(8020, namenodes[0]['port'])
 
     @patch('os.environ.get')
     def test_read_config_ha_with_ports(self, environ_get):
@@ -80,9 +80,9 @@ class ConfigTest(unittest2.TestCase):
         config = HDFSConfig.get_external_config()
 
         namenodes = config['namenodes']
-        self.assertEquals(len(namenodes), 1)
-        self.assertEquals(namenodes[0]['namenode'], 'testhost.net')
-        self.assertEquals(namenodes[0]['port'], 8888)
+        self.assertEqual(len(namenodes), 1)
+        self.assertEqual(namenodes[0]['namenode'], 'testhost.net')
+        self.assertEqual(namenodes[0]['port'], 8888)
         self.assertFalse(config['use_trash'])
 
     @patch('os.environ.get')
