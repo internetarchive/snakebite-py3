@@ -36,10 +36,9 @@ import re
 
 from snakebite.protobuf.RpcHeader_pb2 import RpcRequestHeaderProto, RpcResponseHeaderProto, RpcSaslProto
 from snakebite.config import HDFSConfig
+from snakebite import logger
 
 import google.protobuf.internal.encoder as encoder
-
-import logger
 
 # Configure package logging
 log = logger.getLogger(__name__)
