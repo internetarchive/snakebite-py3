@@ -66,7 +66,7 @@ class Client(object):
     >>> from snakebite.client import Client
     >>> client = Client("localhost", 8020, use_trash=False)
     >>> for x in client.ls(['/']):
-    ...     print x
+    ...     print(x)
 
     .. warning::
 
@@ -1358,7 +1358,7 @@ class HAClient(Client):
     >>> n2 = Namenode("namenode2.mydomain", 8020)
     >>> client = HAClient([n1, n2], use_trash=True)
     >>> for x in client.ls(['/']):
-    ...     print x
+    ...     print(x)
 
     .. note::
         Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
@@ -1483,7 +1483,7 @@ class AutoConfigClient(HAClient):
     >>> from snakebite.client import AutoConfigClient
     >>> client = AutoConfigClient()
     >>> for x in client.ls(['/']):
-    ...     print x
+    ...     print(x)
 
     .. note::
         Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
