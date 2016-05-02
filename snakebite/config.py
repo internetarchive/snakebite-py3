@@ -1,9 +1,12 @@
 import os
 import logging
 import xml.etree.ElementTree as ET
-from urlparse import urlparse
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
 
-from namenode import Namenode
+from snakebite.namenode import Namenode
 
 log = logging.getLogger(__name__)
 
