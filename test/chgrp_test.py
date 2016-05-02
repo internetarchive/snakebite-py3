@@ -12,7 +12,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
-from minicluster_testbase import MiniClusterTestBase
+from test.minicluster_testbase import MiniClusterTestBase
+from snakebite.compat import py_2
 from snakebite.errors import FileNotFoundException
 from snakebite.errors import InvalidInputException
 
@@ -38,8 +39,8 @@ class ChgrpTest(MiniClusterTestBase):
 
     def test_unknown_file(self):
         result = self.client.chgrp(['/nonexistent'], 'myOnwer', recurse=True)
-        self.assertRaises(FileNotFoundException, result.next)
+        self.assertRaises(FileNotFoundException, result.next if py_2 else result.__next__)
 
     def test_invalid_input(self):
         result = self.client.chgrp('/doesnotexist', 'myOnwer')
-        self.assertRaises(InvalidInputException, result.next)
+        self.assertRaises(InvalidInputException, result.next if py_2 else result.__next__)
