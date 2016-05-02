@@ -236,7 +236,7 @@ def _format_permission(decimal_permissions):
 def format_stat(results, json_output=False):
     ret = results
     # By default snakebite returns permissions in decimal.
-    if ret.has_key('permission'):
+    if 'permissions' in ret:
         ret['permission'] = _format_permission(ret['permission'])
     if json_output:
         return json.dumps(ret)
