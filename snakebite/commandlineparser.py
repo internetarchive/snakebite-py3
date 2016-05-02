@@ -18,7 +18,10 @@ import errno
 import sys
 import os
 import json
-from urlparse import urlparse
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
 
 from snakebite.client import HAClient
 from snakebite.errors import FileNotFoundException
