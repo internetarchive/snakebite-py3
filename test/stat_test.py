@@ -12,7 +12,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
-from minicluster_testbase import MiniClusterTestBase
+from test.minicluster_testbase import MiniClusterTestBase
 from snakebite.errors import InvalidInputException
 from snakebite.errors import FileNotFoundException
 from snakebite.formatter import _format_permission
@@ -36,9 +36,9 @@ class StatTest(MiniClusterTestBase):
                           ['/does/not/exist'])
 
     def test_format_permission(self):
-        self.assertEquals(_format_permission(int(0o1777)), '1777')
-        self.assertEquals(_format_permission(int(0o777)), '0777')
-        self.assertEquals(_format_permission(int(0o000777)), '0777')
+        self.assertEqual(_format_permission(int(0o1777)), '1777')
+        self.assertEqual(_format_permission(int(0o777)), '0777')
+        self.assertEqual(_format_permission(int(0o000777)), '0777')
 
     def test_sticky_mode(self):
         list(self.client.chmod(['/sticky_dir'], 0o1777))
