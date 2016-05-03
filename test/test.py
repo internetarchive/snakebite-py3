@@ -24,7 +24,7 @@ import unittest2
 def suite():
     suite = unittest2.TestSuite()
     for filename in glob.glob('test/*_test.py'):
-        print filename
+        print(filename)
         f = os.path.splitext(os.path.basename(filename))[0]
         module = __import__(f)
         suite.addTest(unittest2.defaultTestLoader.loadTestsFromModule(module))
@@ -39,8 +39,8 @@ class run(unittest2.TestProgram):
 
     def usageExit(self, msg=None):
         if msg:
-            print msg
-        print self.USAGE % self.__dict__
+            print(msg)
+        print(self.USAGE % self.__dict__)
         sys.exit(-2)
 
     def runTests(self):

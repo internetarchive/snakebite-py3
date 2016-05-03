@@ -24,7 +24,7 @@ from test.minicluster_testbase import MiniClusterTestBase
 
 class RenameTest(MiniClusterTestBase):
     def test_rename_file(self):
-        print list(self.client.rename(['/zerofile'], '/zerofile2'))
+        print(list(self.client.rename(['/zerofile'], '/zerofile2')))
         expected_output = list(self.client.ls(['/zerofile2'], include_toplevel=True))
         self.assertEqual(len(expected_output), 1)
         self.assertEqual(expected_output[0]['path'], '/zerofile2')

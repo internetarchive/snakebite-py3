@@ -83,5 +83,5 @@ class CatTest(MiniClusterTestBase):
         for _ in range(times):
             f.seek(0)
             for line in f.readlines():
-                print >> p.stdin, line
+                print(line, file=p.stdin)
         p.communicate()
