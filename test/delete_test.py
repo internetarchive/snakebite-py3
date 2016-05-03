@@ -12,10 +12,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
+from snakebite.compat import py_2
 from snakebite.errors import FileNotFoundException
 from snakebite.errors import InvalidInputException
 from snakebite.platformutils import get_current_username
-from minicluster_testbase import MiniClusterTestBase
+from test.minicluster_testbase import MiniClusterTestBase
 
 import os
 import re
@@ -37,11 +38,11 @@ class DeleteTest(MiniClusterTestBase):
 
     def test_unknown_file(self):
         result = self.client.delete(['/doesnotexist'])
-        self.assertRaises(FileNotFoundException, result.next)
+        self.assertRaises(FileNotFoundException, result.next if py_2 else result.__next__)
 
     def test_invalid_input(self):
         result = self.client.delete('/stringpath')
-        self.assertRaises(InvalidInputException, result.next)
+        self.assertRaises(InvalidInputException, result.next if py_2 else result.__next__)
 
     def test_recurse(self):
         list(self.client.delete(['/foo'], recurse=True))
@@ -104,11 +105,11 @@ class DeleteWithTrashTest(MiniClusterTestBase):
 
     def test_unknown_file(self):
         result = self.client.delete(['/doesnotexist'])
-        self.assertRaises(FileNotFoundException, result.next)
+        self.assertRaises(FileNotFoundException, result.next if py_2 else result.__next__)
 
     def test_invalid_input(self):
         result = self.client.delete('/stringpath')
-        self.assertRaises(InvalidInputException, result.next)
+        self.assertRaises(InvalidInputException, result.next if py_2 else result.__next__)
 
     def test_recurse(self):
         location_under_test = '/foo'
