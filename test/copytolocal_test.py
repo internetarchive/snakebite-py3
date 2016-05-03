@@ -15,7 +15,7 @@
 import os
 import shutil
 
-from minicluster_testbase import MiniClusterTestBase
+from test.minicluster_testbase import MiniClusterTestBase
 
 TESTFILES_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "testfiles/temp_testfiles")
 
