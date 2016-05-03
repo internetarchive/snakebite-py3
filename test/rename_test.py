@@ -12,9 +12,10 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
+from snakebite.compat import py_2
 from snakebite.errors import FileNotFoundException
 from snakebite.errors import InvalidInputException
-from minicluster_testbase import MiniClusterTestBase
+from test.minicluster_testbase import MiniClusterTestBase
 
 
 class RenameTest(MiniClusterTestBase):
@@ -24,7 +25,7 @@ class RenameTest(MiniClusterTestBase):
         self.assertEqual(len(expected_output), 1)
         self.assertEqual(expected_output[0]['path'], '/zerofile2')
         result = self.client.ls(['/zerofile'])
-        self.assertRaises(FileNotFoundException, result.next)
+        self.assertRaises(FileNotFoundException, result.next if py_2 else result.__next__)
 
     def test_rename_multi(self):
         list(self.client.rename(['/test1', '/test2'], '/dir1'))
@@ -35,11 +36,11 @@ class RenameTest(MiniClusterTestBase):
 
     def test_unknown_file(self):
         result = self.client.rename(['/doesnotexist'], '/somewhereelse')
-        self.assertRaises(FileNotFoundException, result.next)
+        self.assertRaises(FileNotFoundException, result.next if py_2 else result.__next__)
 
     def test_invalid_input(self):
         result = self.client.rename('/stringpath', '777')
-        self.assertRaises(InvalidInputException, result.next)
+        self.assertRaises(InvalidInputException, result.next if py_2 else result.__next__)
 
     def test_rename_multi_with_trailing_slash(self):
        list(self.client.rename(['/test3', '/test4'], '/dir1/'))
