@@ -12,10 +12,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
+from snakebite.compat import py_2
 from snakebite.errors import FileNotFoundException
 from snakebite.errors import InvalidInputException
 from minicluster_testbase import MiniClusterTestBase
-from util import assertDu
+from test.util import assertDu
 
 
 class DfTest(MiniClusterTestBase):
@@ -38,8 +39,8 @@ class DfTest(MiniClusterTestBase):
 
     def test_unknown_file(self):
         result = self.client.du(['/nonexistent'])
-        self.assertRaises(FileNotFoundException, result.next)
+        self.assertRaises(FileNotFoundException, result.next if py_2 else result.__next__)
 
     def test_invalid_input(self):
         result = self.client.du('/stringpath')
-        self.assertRaises(InvalidInputException, result.next)
+        self.assertRaises(InvalidInputException, result.next if py_2 else result.__next__)
