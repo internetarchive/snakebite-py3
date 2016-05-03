@@ -1,3 +1,6 @@
+# python 3 support
+from __future__ import absolute_import, print_function, division
+
 from test.minicluster_testbase import MiniClusterTestBase
 from snakebite.client import Client
 import os
