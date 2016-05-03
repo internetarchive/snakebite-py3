@@ -14,7 +14,7 @@
 # the License.
 
 from snakebite.errors import DirectoryException, FileException
-from minicluster_testbase import MiniClusterTestBase
+from test.minicluster_testbase import MiniClusterTestBase
 
 class TouchZTest(MiniClusterTestBase):
     counter = 0
