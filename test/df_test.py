@@ -20,7 +20,7 @@ import re
 import unittest2
 
 from test.minicluster_testbase import MiniClusterTestBase
-from snakebite.compat import long
+from snakebite.compat import long, py_2
 from snakebite.formatter import format_fs_stats
 
 class DfTest(MiniClusterTestBase):
@@ -55,32 +55,37 @@ class DfFormatTest(unittest2.TestCase):
   
     def test_middle(self):
         fake = StatsMock(100, 50, 50, 0, 0, 0, "foobar.com")
-        output = format_fs_stats(fake).next().split('\n')
+        fs_stats = format_fs_stats(fake)
+        output = (fs_stats.next() if py_2 else next(fs_stats)).split('\n')
         stats = output[1].split()
         self.assertEqual(stats[4], "50.00%")
         self.assertEqual(stats[0], "foobar.com")
 
     def test_frag(self):
         fake = StatsMock(312432, 23423, 289009, 0, 0, 0, "foobar.com")
-        output = format_fs_stats(fake).next().split('\n')
+        fs_stats = format_fs_stats(fake)
+        output = (fs_stats.next() if py_2 else next(fs_stats)).split('\n')
         stats = output[1].split()
         self.assertEqual(stats[4], "7.50%")
  
     def test_zero_size(self):
         fake = StatsMock(0, 0, 0, 0, 0, 0, "foobar.com")
-        output = format_fs_stats(fake).next().split('\n')
+        fs_stats = format_fs_stats(fake)
+        output = (fs_stats.next() if py_2 else next(fs_stats)).split('\n')
         stats = output[1].split()
         self.assertEqual(stats[4], "0.00%")
 
     def test_corrupted_zero_size(self):
         fake = StatsMock(0, 50, 50, 0, 0, 0, "foobar.com")
-        output = format_fs_stats(fake).next().split('\n')
+        fs_stats = format_fs_stats(fake)
+        output = (fs_stats.next() if py_2 else next(fs_stats)).split('\n')
         stats = output[1].split()
         self.assertEqual(stats[4], "0.00%")
 
     def test_full_size(self):
         fake = StatsMock(50, 50, 0, 0, 0, 0, "foobar.com")
-        output = format_fs_stats(fake).next().split('\n')
+        fs_stats = format_fs_stats(fake)
+        output = (fs_stats.next() if py_2 else next(fs_stats)).split('\n')
         stats = output[1].split()
         self.assertEqual(stats[4], "100.00%")
 
