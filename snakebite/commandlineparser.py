@@ -44,6 +44,7 @@ from snakebite.platformutils import get_current_username
 from snakebite.compat import py_2
 
 
+stdout = py_2 and (sys.stdout) or (sys.stdout.buffer)
 
 
 def print_error_exit(msg, fd=sys.stderr):
@@ -676,7 +677,7 @@ class CommandLineParser(object):
     def cat(self):
         for file_to_read in self.client.cat(self.args.dir, check_crc=self.args.checkcrc):
             for load in file_to_read:
-                sys.stdout.write(load)
+                stdout.write(load)
 
     @command(args="path dst", descr="copy local file reference to destination", req_args=['dir [dirs]', 'arg'], visible=False)
     def copyFromLocal(self):
