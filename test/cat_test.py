@@ -25,7 +25,7 @@ from test.minicluster_testbase import MiniClusterTestBase
 class CatTest(MiniClusterTestBase):
 
     def test_cat_file_on_1_block(self):  # Size < 1 block
-        client_output = ''
+        client_output = b''
         for file_to_read in self.client.cat(['/test3']):
             for data in file_to_read:
                 client_output += data
@@ -33,7 +33,7 @@ class CatTest(MiniClusterTestBase):
         self.assertEqual(expected_output, client_output)
 
     def test_cat_file_on_1_block_checkcrc(self):  # Size < 1 block
-        client_output = ''
+        client_output = b''
         for file_to_read in self.client.cat(['/test3'], check_crc=True):
             for data in file_to_read:
                 client_output += data
@@ -44,7 +44,7 @@ class CatTest(MiniClusterTestBase):
         self._write_to_test_cluster('/test1', 10, '/temp_test', 4 * 1024 * 1024)
         # 6.77972 MB of test data, with 4MB block size gives 2 blocks
 
-        client_output = ''
+        client_output = b''
         for file_to_read in self.client.cat(['/temp_test']):
             for data in file_to_read:
                 client_output += data
@@ -57,7 +57,7 @@ class CatTest(MiniClusterTestBase):
         # size of the test data will be 677,972 * 10 = 6.77972 MB, and with
         #block size 3 MB, it gives as 3 blocks
 
-        client_output = ''
+        client_output = b''
         for file_to_read in self.client.cat(['/temp_test2']):
             for data in file_to_read:
                 client_output += data
@@ -69,7 +69,7 @@ class CatTest(MiniClusterTestBase):
         # test3 is 1024 bytes, write it 1024 times to get 1MB of test data
         # set block size to 1MB to get exactly one block
 
-        client_output = ''
+        client_output = b''
         for file_to_read in self.client.cat(['/temp_test3']):
             for data in file_to_read:
                 client_output += data
