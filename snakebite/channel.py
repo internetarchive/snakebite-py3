@@ -493,12 +493,12 @@ class DataXceiverChannel(object):
         if depth > self.MAX_READ_ATTEMPTS:
             raise TransientException("Tried to read %d more bytes, but failed after %d attempts" % (n, self.MAX_READ_ATTEMPTS))
 
-        bytes = self.sock.recv(n)
-        if len(bytes) < n:
-            left = n - len(bytes)
+        _bytes = self.sock.recv(n)
+        if len(_bytes) < n:
+            left = n - len(_bytes)
             depth += 1
-            bytes += self._read_bytes(left, depth)
-        return bytes
+            _bytes += self._read_bytes(left, depth)
+        return _bytes
 
     def write(self, data):
         if log.getEffectiveLevel() == logging.DEBUG:
@@ -630,7 +630,7 @@ class DataXceiverChannel(object):
 
                 read_on_packet = 0
                 for i in range(loads_per_packet):
-                    load = ''
+                    load = b''
                     for j in range(chunks_per_load):
                         log.debug("Reading chunk %s in load %s:", j, i)
                         bytes_to_read = min(bytes_per_chunk, data_len - read_on_packet)
