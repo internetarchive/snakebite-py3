@@ -793,7 +793,7 @@ class Client(object):
             raise InvalidInputException("getmerge: no destination given")
 
         temporary_target = "%s._COPYING_" % dst
-        f = open(temporary_target, 'w')
+        f = open(temporary_target, 'wb')
 
         processor = lambda path, node, dst=dst, check_crc=check_crc: self._handle_getmerge(path, node, dst, check_crc)
         try:
@@ -903,7 +903,7 @@ class Client(object):
                 yield item
 
     def _handle_tail(self, path, node, tail_length, append):
-        data = ''
+        data = b''
         for load in self._read_file(path, node, tail_only=True, check_crc=False, tail_length=tail_length):
             data += load
         # We read only the necessary packets but still
@@ -970,7 +970,7 @@ class Client(object):
         if self._is_dir(node):
             raise DirectoryException("text: `%s': Is a directory" % path)
 
-        text = ''
+        text = b''
         for load in self._read_file(path, node, False, check_crc):
             text += load
 
