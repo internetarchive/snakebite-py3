@@ -41,6 +41,9 @@ from snakebite.config import HDFSConfig
 from snakebite.version import version
 from snakebite.namenode import Namenode
 from snakebite.platformutils import get_current_username
+from snakebite.compat import py_2
+
+
 
 
 def print_error_exit(msg, fd=sys.stderr):
@@ -59,7 +62,7 @@ def exitError(exc_info):
     elif isinstance(exc_value, RequestError):
         print("Request error: %s" % str(exc_value))
     else:
-        raise exc_type, exc_value, exc_traceback
+        raise exc_type(exc_value).with_traceback(exc_traceback)
     sys.exit(-1)
 
 
@@ -393,11 +396,11 @@ class CommandLineParser(object):
                 ports.append(parse_result.port)
 
         # remove duplicates and None from (hosts + self.args.namenode)
-        hosts = filter(lambda x: x != None, set(hosts + [self.args.namenode]))
+        hosts = list(filter(lambda x: x != None, set(hosts + [self.args.namenode])))
         if len(hosts) > 1:
             print_error_exit('Conficiting namenode hosts in commandline arguments, hosts: %s' % str(hosts))
 
-        ports = filter(lambda x: x != None, set(ports + [self.args.port]))
+        ports = list(filter(lambda x: x != None, set(ports + [self.args.port])))
         if len(ports) > 1:
             print_error_exit('Conflicting namenode ports in commandline arguments, ports: %s' % str(ports))
 
@@ -424,7 +427,7 @@ class CommandLineParser(object):
 
         try:
             args = self.parser.parse_args(non_cli_input)
-        except ArgumentParserError, error:
+        except ArgumentParserError as error:
             if "-h" in sys.argv or "--help" in sys.argv:  # non cli input?
                 commands = [cmd for (cmd, description) in Commands.methods.items() if description['visible'] is True]
                 command = error.prog.split()[-1]
