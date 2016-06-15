@@ -17,7 +17,7 @@
 from __future__ import absolute_import, print_function, division
 
 from snakebite.errors import FileAlreadyExistsException
-from minicluster_testbase import MiniClusterTestBase
+from test.minicluster_testbase import MiniClusterTestBase
 
 
 class Rename2Test(MiniClusterTestBase):

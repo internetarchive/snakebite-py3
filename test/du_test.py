@@ -19,7 +19,7 @@ from __future__ import absolute_import, print_function, division
 from snakebite.compat import py_2
 from snakebite.errors import FileNotFoundException
 from snakebite.errors import InvalidInputException
-from minicluster_testbase import MiniClusterTestBase
+from test.minicluster_testbase import MiniClusterTestBase
 from test.util import assertDu
 
 
