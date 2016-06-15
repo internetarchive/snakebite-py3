@@ -59,7 +59,7 @@ from snakebite.platformutils import get_current_username
 from snakebite.formatter import format_bytes
 from snakebite.errors import RequestError, TransientException, FatalException
 from snakebite.crc32c import crc
-from snakebite.compat import range
+from snakebite.compat import range, py_2
 from snakebite import logger
 
 import google.protobuf.internal.encoder as encoder
@@ -155,7 +155,7 @@ class RpcBufferedReader(object):
         log.debug("Reset buffer to pos %d" % self.pos)
 
     def reset(self):
-        self.buffer = ""
+        self.buffer = b""
         self.pos = -1  # position of last byte read
 
     @property
@@ -166,7 +166,7 @@ class RpcBufferedReader(object):
 
 class SocketRpcChannel(RpcChannel):
     ERROR_BYTES = 18446744073709551615
-    RPC_HEADER = "hrpc"
+    RPC_HEADER = b"hrpc"
     RPC_SERVICE_CLASS = 0x00
     AUTH_PROTOCOL_NONE = 0x00
     AUTH_PROTOCOL_SASL = 0xDF
@@ -184,7 +184,7 @@ class SocketRpcChannel(RpcChannel):
         self.sock = None
         self.call_id = -3  # First time (when the connection context is sent, the call_id should be -3, otherwise start with 0 and increment)
         self.version = version
-        self.client_id = str(uuid.uuid4())
+        self.client_id = str(uuid.uuid4()).encode("utf-8")
         self.use_sasl = use_sasl
         self.hdfs_namenode_principal = hdfs_namenode_principal
         if self.use_sasl:
