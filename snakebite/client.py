@@ -1059,7 +1059,7 @@ class Client(object):
 
     def _get_full_path(self, path, node):
         if node.path:
-            return posixpath.join(path, node.path)
+            return posixpath.join(path, node.path.decode("utf-8"))
         else:
             return path
 
@@ -1231,7 +1231,7 @@ class Client(object):
                         # Recurse into directories
                         if recurse and self._is_dir(node):
                             # Construct the full path before processing
-                            full_path = posixpath.join(path, node.path)
+                            full_path = posixpath.join(path, node.path.decode("utf-8"))
                             for item in self._find_items([full_path],
                                                          processor,
                                                          include_toplevel=False,
@@ -1239,7 +1239,7 @@ class Client(object):
                                                          recurse=recurse):
                                 yield item
 
-    def _get_dir_listing(self, path, start_after=''):
+    def _get_dir_listing(self, path, start_after=b''):
         request = client_proto.GetListingRequestProto()
         request.src = path
         request.startAfter = start_after
