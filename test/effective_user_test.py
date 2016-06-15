@@ -22,7 +22,7 @@ class EffectiveUserTest(MiniClusterTestBase):
         print(tuple(self.custom_client.touchz([self.VALID_FILE])))
         try:
             tuple(self.custom_foobar_client.touchz([self.INVALID_FILE]))
-	except Exception as e:
+        except Exception as e:
             self.assertTrue(e.message.startswith(self.ERR_MSG_TOUCH))
 
         self.custom_client.stat([self.VALID_FILE])
