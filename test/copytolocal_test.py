@@ -36,7 +36,7 @@ class CopyToLocalTest(MiniClusterTestBase):
         for result in self.client.copyToLocal(['/test3'], target_dir):
             self.assertEqual(result['path'], target_dir)
 
-            client_content = self._read_file(target_dir)
+            client_content = self._read_file(target_dir).encode("utf-8")
             self.assertEqual(client_content, expected_content)
 
             self.assertEqual(result['result'], True)
