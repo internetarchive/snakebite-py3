@@ -43,8 +43,8 @@ class CountTest(MiniClusterTestBase):
 
     def test_unknown_file(self):
         result = self.client.count(['/doesnotexist'])
-        self.assertRaises(FileNotFoundException, result.next if py_2 else results.__next__)
+        self.assertRaises(FileNotFoundException, result.next if py_2 else result.__next__)
 
     def test_invalid_input(self):
         result = self.client.count('/stringpath')
-        self.assertRaises(InvalidInputException, result.next if py_2 else results.__next__)
+        self.assertRaises(InvalidInputException, result.next if py_2 else result.__next__)
