@@ -16,16 +16,16 @@
 # python 3 support
 from __future__ import absolute_import, print_function, division
 
-from minicluster_testbase import MiniClusterTestBase
+from test.minicluster_testbase import MiniClusterTestBase
 
 
 class TextTest(MiniClusterTestBase):
     def test_text_gzip(self):
         expected_output = self.cluster.text('/zipped/test1.gz')
         client_output = list(self.client.text(['/zipped/test1.gz']))[0]
-        self.assertEqual(expected_output, client_output)
+        self.assertEqual(expected_output, client_output.decode("utf-8"))
 
     def test_text_bzip2(self):
         expected_output = self.cluster.text('/zipped/test1.bz2')
         client_output = list(self.client.text(['/zipped/test1.bz2']))[0]
-        self.assertEqual(expected_output, client_output)
+        self.assertEqual(expected_output, client_output.decode("utf-8"))
