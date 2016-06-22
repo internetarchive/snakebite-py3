@@ -1,5 +1,5 @@
 language: python
-python: 2.7
+python: 3.4
 jdk: oraclejdk7
 sudo: false
 branches:
@@ -8,8 +8,6 @@ branches:
 env:
   - TOX_ENV=py34-cdh
   - TOX_ENV=py34-hdp
-  - TOX_ENV=py35-hdp
-  - TOX_ENV=py35-hdp
 install:
   - pip install tox
 script:
