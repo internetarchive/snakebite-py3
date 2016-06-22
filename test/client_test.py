@@ -13,6 +13,11 @@ from snakebite.namenode import Namenode
 from snakebite.errors import OutOfNNException, RequestError, InvalidInputException
 
 
+class SocketError(socket.error):
+    """Provide socket.error encapsulation for Mock side effects"""
+    pass
+
+
 class ClientTest(unittest2.TestCase):
     original_hdfs_try_path = HDFSConfig.hdfs_try_paths
     original_core_try_path = HDFSConfig.core_try_paths
@@ -24,7 +29,7 @@ class ClientTest(unittest2.TestCase):
         HDFSConfig.core_try_paths = self.original_core_try_path
 
     def test_ha_client_econnrefused_socket_error(self):
-        e = socket.error
+        e = SocketError
         e.errno = errno.ECONNREFUSED
         mocked_client_cat = Mock(side_effect=e)
         ha_client = HAClient([Namenode("foo"), Namenode("bar")])
@@ -33,7 +38,7 @@ class ClientTest(unittest2.TestCase):
         self.assertRaises(OutOfNNException, all, cat_result_gen)
 
     def test_ha_client_ehostunreach_socket_error(self):
-        e = socket.error
+        e = SocketError
         e.errno = errno.EHOSTUNREACH
         mocked_client_cat = Mock(side_effect=e)
         ha_client = HAClient([Namenode("foo"), Namenode("bar")])
