@@ -23,10 +23,10 @@ class EffectiveUserTest(MiniClusterTestBase):
         try:
             tuple(self.custom_foobar_client.touchz([self.INVALID_FILE]))
         except Exception as e:
-            self.assertTrue(e.message.startswith(self.ERR_MSG_TOUCH))
+            self.assertTrue(e.args[0].startswith(self.ERR_MSG_TOUCH))
 
         self.custom_client.stat([self.VALID_FILE])
         try:
             self.custom_client.stat([self.INVALID_FILE])
         except Exception as e:
-            self.assertEquals(e.message, self.ERR_MSG_STAT)
+            self.assertEquals(e.args[0], self.ERR_MSG_STAT)
