@@ -44,7 +44,10 @@ from snakebite.platformutils import get_current_username
 from snakebite.compat import py_2
 
 
-stdout = py_2 and (sys.stdout) or (sys.stdout.buffer)
+try:
+    stdout = sys.stdout.buffer
+except AttributeError:
+    stdout = sys.stdout
 
 
 def print_error_exit(msg, fd=sys.stderr):
