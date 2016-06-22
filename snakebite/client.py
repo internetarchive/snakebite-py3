@@ -806,7 +806,7 @@ class Client(object):
                             os.remove(temporary_target)
                         raise FatalException(load['error'])
                 if newline and load['response']:
-                    f.write("\n")
+                    f.write(b"\n")
             yield {"path": dst, "response": '', "result": True, "error": load['error'], "source_path": path}
 
         finally:
