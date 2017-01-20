@@ -1130,16 +1130,19 @@ class Client(object):
 
             # Prioritize locations to read from
             locations_queue = PriorityQueue()  # Primitive queuing based on a node's past failure
+            count = 0
             for location in block.locs:
+                # added an incrementing block count here to overcome a limitation with heappush() in python3 (it will raise a typeError without 'count')
+                count += 1
                 if location.id.storageID in failed_nodes:
-                    locations_queue.put((1, location))  # Priority num, data
+                    locations_queue.put((1, count, location))  # Priority num, count (for enforced orderability), data
                 else:
-                    locations_queue.put((0, location))
+                    locations_queue.put((0, count, location))
 
             # Read data
             successful_read = False
             while not locations_queue.empty():
-                location = locations_queue.get()[1]
+                location = locations_queue.get()[2]
                 host = location.id.ipAddr
                 port = int(location.id.xferPort)
                 data_xciever = DataXceiverChannel(host, port)
