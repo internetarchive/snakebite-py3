@@ -1132,12 +1132,12 @@ class Client(object):
             locations_queue = PriorityQueue()  # Primitive queuing based on a node's past failure
             count = 0
             for location in block.locs:
-                # added an incrementing block count here to overcome a limitation with heappush() in python3 (it will raise a typeError without 'count')
-                count += 1
                 if location.id.storageID in failed_nodes:
                     locations_queue.put((1, count, location))  # Priority num, count (for enforced orderability), data
                 else:
                     locations_queue.put((0, count, location))
+                # added an incrementing block count here to overcome a limitation with heappush() in python3 (it will raise a typeError without 'count')
+                count += 1
 
             # Read data
             successful_read = False
