@@ -153,17 +153,17 @@ class Client(object):
         Directory listing
 
         >>> list(client.ls(["/"]))
-        [{'group': u'supergroup', 'permission': 420, 'file_type': 'f', 'access_time': 1367317324982L, 'block_replication': 1, 'modification_time': 1367317325346L, 'length': 6783L, 'blocksize': 134217728L, 'owner': u'wouter', 'path': '/Makefile'}, {'group': u'supergroup', 'permission': 493, 'file_type': 'd', 'access_time': 0L, 'block_replication': 0, 'modification_time': 1367317325431L, 'length': 0L, 'blocksize': 0L, 'owner': u'wouter', 'path': '/build'}, {'group': u'supergroup', 'permission': 420, 'file_type': 'f', 'access_time': 1367317326510L, 'block_replication': 1, 'modification_time': 1367317326522L, 'length': 100L, 'blocksize': 134217728L, 'owner': u'wouter', 'path': '/index.asciidoc'}, {'group': u'supergroup', 'permission': 493, 'file_type': 'd', 'access_time': 0L, 'block_replication': 0, 'modification_time': 1367317326628L, 'length': 0L, 'blocksize': 0L, 'owner': u'wouter', 'path': '/source'}]
+        [{'group': u'supergroup', 'permission': 420, 'file_type': 'f', 'access_time': 1367317324982, 'block_replication': 1, 'modification_time': 1367317325346, 'length': 6783, 'blocksize': 134217728, 'owner': u'wouter', 'path': '/Makefile'}, {'group': u'supergroup', 'permission': 493, 'file_type': 'd', 'access_time': 0, 'block_replication': 0, 'modification_time': 1367317325431, 'length': 0, 'blocksize': 0, 'owner': u'wouter', 'path': '/build'}, {'group': u'supergroup', 'permission': 420, 'file_type': 'f', 'access_time': 1367317326510, 'block_replication': 1, 'modification_time': 1367317326522, 'length': 100, 'blocksize': 134217728, 'owner': u'wouter', 'path': '/index.asciidoc'}, {'group': u'supergroup', 'permission': 493, 'file_type': 'd', 'access_time': 0, 'block_replication': 0, 'modification_time': 1367317326628, 'length': 0, 'blocksize': 0, 'owner': u'wouter', 'path': '/source'}]
 
         File listing
 
         >>> list(client.ls(["/Makefile"]))
-        [{'group': u'supergroup', 'permission': 420, 'file_type': 'f', 'access_time': 1367317324982L, 'block_replication': 1, 'modification_time': 1367317325346L, 'length': 6783L, 'blocksize': 134217728L, 'owner': u'wouter', 'path': '/Makefile'}]
+        [{'group': u'supergroup', 'permission': 420, 'file_type': 'f', 'access_time': 1367317324982, 'block_replication': 1, 'modification_time': 1367317325346, 'length': 6783, 'blocksize': 134217728, 'owner': u'wouter', 'path': '/Makefile'}]
 
         Get directory information
 
         >>> list(client.ls(["/source"], include_toplevel=True, include_children=False))
-        [{'group': u'supergroup', 'permission': 493, 'file_type': 'd', 'access_time': 0L, 'block_replication': 0, 'modification_time': 1367317326628L, 'length': 0L, 'blocksize': 0L, 'owner': u'wouter', 'path': '/source'}]
+        [{'group': u'supergroup', 'permission': 493, 'file_type': 'd', 'access_time': 0, 'block_replication': 0, 'modification_time': 1367317326628, 'length': 0, 'blocksize': 0, 'owner': u'wouter', 'path': '/source'}]
         '''
         if not isinstance(paths, list):
             raise InvalidInputException("Paths should be a list")
@@ -299,7 +299,7 @@ class Client(object):
         **Examples:**
 
         >>> list(client.count(['/']))
-        [{'spaceConsumed': 260185L, 'quota': 2147483647L, 'spaceQuota': 18446744073709551615L, 'length': 260185L, 'directoryCount': 9L, 'path': '/', 'fileCount': 34L}]
+        [{'spaceConsumed': 260185, 'quota': 2147483647, 'spaceQuota': 18446744073709551615, 'length': 260185, 'directoryCount': 9, 'path': '/', 'fileCount': 34}]
 
         '''
         if not isinstance(paths, list):
@@ -331,7 +331,7 @@ class Client(object):
         **Examples:**
 
         >>> client.df()
-        {'used': 491520L, 'capacity': 120137519104L, 'under_replicated': 0L, 'missing_blocks': 0L, 'filesystem': 'hdfs://localhost:8020', 'remaining': 19669295104L, 'corrupt_blocks': 0L}
+        {'used': 491520, 'capacity': 120137519104, 'under_replicated': 0, 'missing_blocks': 0, 'filesystem': 'hdfs://localhost:8020', 'remaining': 19669295104, 'corrupt_blocks': 0}
         '''
         processor = lambda path, node: self._handle_df(path, node)
         return list(self._find_items(['/'], processor, include_toplevel=True, include_children=False, recurse=False))[0]
@@ -361,12 +361,12 @@ class Client(object):
         Children:
 
         >>> list(client.du(['/']))
-        [{'path': '/Makefile', 'length': 6783L}, {'path': '/build', 'length': 244778L}, {'path': '/index.asciidoc', 'length': 100L}, {'path': '/source', 'length': 8524L}]
+        [{'path': '/Makefile', 'length': 6783}, {'path': '/build', 'length': 244778}, {'path': '/index.asciidoc', 'length': 100}, {'path': '/source', 'length': 8524}]
 
         Directory only:
 
         >>> list(client.du(['/'], include_toplevel=True, include_children=False))
-        [{'path': '/', 'length': 260185L}]
+        [{'path': '/', 'length': 260185}]
 
         '''
         if not isinstance(paths, list):
@@ -862,7 +862,7 @@ class Client(object):
         **Example:**
 
         >>> client.stat(['/index.asciidoc'])
-        {'blocksize': 134217728L, 'owner': u'wouter', 'length': 100L, 'access_time': 1367317326510L, 'group': u'supergroup', 'permission': 420, 'file_type': 'f', 'path': '/index.asciidoc', 'modification_time': 1367317326522L, 'block_replication': 1}
+        {'blocksize': 134217728, 'owner': u'wouter', 'length': 100, 'access_time': 1367317326510, 'group': u'supergroup', 'permission': 420, 'file_type': 'f', 'path': '/index.asciidoc', 'modification_time': 1367317326522, 'block_replication': 1}
         '''
         if not isinstance(paths, list):
             raise InvalidInputException("Paths should be a list")
@@ -1044,7 +1044,7 @@ class Client(object):
         **Example:**
 
         >>> client.serverdefaults()
-        [{'writePacketSize': 65536, 'fileBufferSize': 4096, 'replication': 1, 'bytesPerChecksum': 512, 'trashInterval': 0L, 'blockSize': 134217728L, 'encryptDataTransfer': False, 'checksumType': 2}]
+        [{'writePacketSize': 65536, 'fileBufferSize': 4096, 'replication': 1, 'bytesPerChecksum': 512, 'trashInterval': 0, 'blockSize': 134217728, 'encryptDataTransfer': False, 'checksumType': 2}]
 
         '''
 
@@ -1479,7 +1479,7 @@ class HAClient(Client):
 
     def __calculate_exponential_time(self, time, retries, cap):
         # Same calculation as the original Hadoop client but converted to seconds
-        baseTime = min(time * (1L << retries), cap);
+        baseTime = min(time * (1 << retries), cap);
         return (baseTime * (random.random() + 0.5)) / 1000;
 
     def __do_retry_sleep(self, retries):
