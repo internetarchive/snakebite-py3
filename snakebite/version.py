@@ -2,8 +2,7 @@
 from __future__ import absolute_import, print_function, division
 
 
-VERSION = "2.8.2"
-
+VERSION = "3.0"
 
 def version():
     return VERSION

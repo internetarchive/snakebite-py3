@@ -53,6 +53,7 @@ import errno
 import time
 import re
 import sys
+import random
 
 
 log = logging.getLogger(__name__)
@@ -91,7 +92,9 @@ class Client(object):
         3: "s"
     }
 
-    def __init__(self, host, port=Namenode.DEFAULT_PORT, hadoop_version=Namenode.DEFAULT_VERSION, use_trash=False, effective_user=None, use_sasl=False, hdfs_namenode_principal=None):
+    def __init__(self, host, port=Namenode.DEFAULT_PORT, hadoop_version=Namenode.DEFAULT_VERSION,
+                 use_trash=False, effective_user=None, use_sasl=False, hdfs_namenode_principal=None,
+                 sock_connect_timeout=10000, sock_request_timeout=10000, use_datanode_hostname=False):
         '''
         :param host: Hostname or IP address of the NameNode
         :type host: string
@@ -107,6 +110,12 @@ class Client(object):
         :type use_sasl: boolean
         :param hdfs_namenode_principal: Kerberos principal to use for HDFS
         :type hdfs_namenode_principal: string
+        :param sock_connect_timeout: Socket connection timeout in seconds
+        :type sock_connect_timeout: int
+        :param sock_request_timeout: Request timeout in seconds
+        :type sock_request_timeout: int
+        :param use_datanode_hostname: Use hostname instead of IP address to commuicate with datanodes
+        :type use_datanode_hostname: boolean
         '''
         if hadoop_version < 9:
             raise FatalException("Only protocol versions >= 9 supported")
@@ -116,10 +125,13 @@ class Client(object):
         self.use_sasl = use_sasl
         self.hdfs_namenode_principal = hdfs_namenode_principal
         self.service_stub_class = client_proto.ClientNamenodeProtocol_Stub
-        self.service = RpcService(self.service_stub_class, self.port, self.host, hadoop_version, effective_user, self.use_sasl, self.hdfs_namenode_principal)
+        self.service = RpcService(self.service_stub_class, self.port, self.host, hadoop_version,
+                                  effective_user,self.use_sasl, self.hdfs_namenode_principal,
+                                  sock_connect_timeout, sock_request_timeout)
         self.use_trash = use_trash
         self.trash = self._join_user_path(".Trash")
         self._server_defaults = None
+        self.use_datanode_hostname = use_datanode_hostname
 
         log.debug("Created client for %s:%s with trash=%s and sasl=%s" % (host, port, use_trash, use_sasl))
 
@@ -1143,7 +1155,7 @@ class Client(object):
             successful_read = False
             while not locations_queue.empty():
                 location = locations_queue.get()[2]
-                host = location.id.ipAddr
+                host = location.id.hostName if self.use_datanode_hostname else location.id.ipAddr
                 port = int(location.id.xferPort)
                 data_xciever = DataXceiverChannel(host, port)
                 if data_xciever.connect():
@@ -1378,7 +1390,14 @@ class HAClient(Client):
                 else:
                     setattr(cls, name, cls._ha_return_method(meth))
 
-    def __init__(self, namenodes, use_trash=False, effective_user=None, use_sasl=False, hdfs_namenode_principal=None):
+    def _reset_retries(self):
+        log.debug("Resetting retries and failovers")
+        self.failovers = 0
+        self.retries = 0
+
+    def __init__(self, namenodes, use_trash=False, effective_user=None, use_sasl=False, hdfs_namenode_principal=None,
+                 max_failovers=15, max_retries=10, base_sleep=500, max_sleep=15000, sock_connect_timeout=10000,
+                 sock_request_timeout=10000, use_datanode_hostname=False):
         '''
         :param namenodes: Set of namenodes for HA setup
         :type namenodes: list
@@ -1390,11 +1409,35 @@ class HAClient(Client):
         :type use_sasl: boolean
         :param hdfs_namenode_principal: Kerberos principal to use for HDFS
         :type hdfs_namenode_principal: string
+        :param max_retries: Number of failovers in case of connection issues
+        :type max_retries: int
+        :param max_retries: Max number of retries for failures
+        :type max_retries: int
+        :param base_sleep: Base sleep time for retries in milliseconds
+        :type base_sleep: int
+        :param max_sleep: Max sleep time for retries in milliseconds
+        :type max_sleep: int
+        :param sock_connect_timeout: Socket connection timeout in seconds
+        :type sock_connect_timeout: int
+        :param sock_request_timeout: Request timeout in seconds
+        :type sock_request_timeout: int
+        :param use_datanode_hostname: Use hostname instead of IP address to commuicate with datanodes
+        :type use_datanode_hostname: boolean
         '''
         self.use_trash = use_trash
         self.effective_user = effective_user
         self.use_sasl = use_sasl
         self.hdfs_namenode_principal = hdfs_namenode_principal
+        self.max_failovers = max_failovers
+        self.max_retries = max_retries
+        self.base_sleep = base_sleep
+        self.max_sleep = max_sleep
+        self.sock_connect_timeout = sock_connect_timeout
+        self.sock_request_timeout = sock_request_timeout
+        self.use_datanode_hostname = use_datanode_hostname
+
+        self.failovers = -1
+        self.retries = -1
 
         if not namenodes:
             # Using InvalidInputException instead of OutOfNNException because the later is transient but current case
@@ -1403,49 +1446,88 @@ class HAClient(Client):
         self.namenode = self._switch_namenode(namenodes)
         next(self.namenode)
 
-    def _switch_namenode(self, namenodes):
-        for namenode in namenodes:
-            log.debug("Switch to namenode: %s:%d" % (namenode.host, namenode.port))
-
-            yield super(HAClient, self).__init__(namenode.host,
-                                                 namenode.port,
-                                                 namenode.version,
-                                                 self.use_trash,
-                                                 self.effective_user,
-                                                 self.use_sasl,
-                                                 self.hdfs_namenode_principal)
-        else:
-            msg = "Request tried and failed for all %d namenodes: " % len(namenodes)
+    def _check_failover(self, namenodes):
+        if (self.failovers == -1):
+            return
+        elif (self.failovers >= self.max_failovers):
+            msg = "Request tried and failed for all %d namenodes after %d failovers: " % (len(namenodes), self.failovers)
             for namenode in namenodes:
                 msg += "\n\t* %s:%d" % (namenode.host, namenode.port)
             msg += "\nLook into debug messages - add -D flag!"
+            log.debug(msg)
             raise OutOfNNException(msg)
+        log.debug("Failover attempt %d:", self.failovers)
+        self.__do_retry_sleep(self.failovers)
+        self.failovers += 1
+
+    def _switch_namenode(self, namenodes):
+        while (True):
+            for namenode in namenodes:
+                self._check_failover(namenodes)
+                log.debug("Switch to namenode: %s:%d" % (namenode.host, namenode.port))
+                yield super(HAClient, self).__init__(namenode.host,
+                                                     namenode.port,
+                                                     namenode.version,
+                                                     self.use_trash,
+                                                     self.effective_user,
+                                                     self.use_sasl,
+                                                     self.hdfs_namenode_principal,
+                                                     self.sock_connect_timeout,
+                                                     self.sock_request_timeout,
+                                                     self.use_datanode_hostname)
+
+
+    def __calculate_exponential_time(self, time, retries, cap):
+        # Same calculation as the original Hadoop client but converted to seconds
+        baseTime = min(time * (1L << retries), cap);
+        return (baseTime * (random.random() + 0.5)) / 1000;
+
+    def __do_retry_sleep(self, retries):
+        # Don't wait for the first retry.
+        if (retries <= 0):
+            sleep_time = 0
+        else:
+            sleep_time = self.__calculate_exponential_time(self.base_sleep, retries, self.max_sleep)
+        log.debug("Doing retry sleep for %s seconds", sleep_time)
+        time.sleep(sleep_time)
+
+    def __should_retry(self):
+        if self.retries >= self.max_retries:
+            return False
+        else:
+            log.debug("Running retry %d of %d", self.retries, self.max_retries)
+            self.__do_retry_sleep(self.retries)
+            self.retries += 1
+            return True
 
     def __handle_request_error(self, exception):
         log.debug("Request failed with %s" % exception)
         if exception.args[0].startswith("org.apache.hadoop.ipc.StandbyException"):
-            pass
+            next(self.namenode) # Failover and retry until self.max_failovers was reached
+        elif exception.args[0].startswith("org.apache.hadoop.ipc.RetriableException") and self.__should_retry():
+            return
         else:
             # There's a valid NN in active state, but there's still request error - raise
+            # The Java Hadoop client does retry exceptions that are instance of IOException but
+            # not instance of RemoteException here. However some cases have an at most once flag
+            # thus we should not simply retry everything here. Let's fail it for now.
             raise
-        next(self.namenode)
 
     def __handle_socket_error(self, exception):
         log.debug("Request failed with %s" % exception)
         if exception.errno in (errno.ECONNREFUSED, errno.EHOSTUNREACH):
             # if NN is down or machine is not available, pass it:
-            pass
+            next(self.namenode) # Failover and retry until self.max_failovers was reached
         elif isinstance(exception, socket.timeout):
-            # if there's communication/socket timeout, pass it:
-            pass
+            next(self.namenode) # Failover and retry until self.max_failovers was reached
         else:
             raise
-        next(self.namenode)
 
     @staticmethod
     def _ha_return_method(func):
         ''' Method decorator for 'return type' methods '''
         def wrapped(self, *args, **kw):
+            self._reset_retries()
             while(True): # switch between all namenodes
                 try:
                     return func(self, *args, **kw)
@@ -1459,6 +1541,7 @@ class HAClient(Client):
     def _ha_gen_method(func):
         ''' Method decorator for 'generator type' methods '''
         def wrapped(self, *args, **kw):
+            self._reset_retries()
             while(True): # switch between all namenodes
                 try:
                     results = func(self, *args, **kw)
@@ -1506,4 +1589,10 @@ class AutoConfigClient(HAClient):
         nns = [Namenode(nn['namenode'], nn['port'], hadoop_version) for nn in configs['namenodes']]
         if not nns:
             raise InvalidInputException("List of namenodes is empty - couldn't create the client")
-        super(AutoConfigClient, self).__init__(nns, configs.get('use_trash', False), effective_user, configs.get('use_sasl', False), configs.get('hdfs_namenode_principal', None))
+
+        super(AutoConfigClient, self).__init__(nns, configs.get('use_trash', False), effective_user,
+                                               configs.get('use_sasl', False), configs.get('hdfs_namenode_principal', None),
+                                               configs.get('failover_max_attempts'), configs.get('client_retries'),
+                                               configs.get('client_sleep_base_millis'), configs.get('client_sleep_max_millis'),
+                                               10000, configs.get('socket_timeout_millis'),
+                                               use_datanode_hostname=configs.get('use_datanode_hostname', False))

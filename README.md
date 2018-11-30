@@ -28,11 +28,7 @@ Installing
 Snakebite releases are available through pypi at
 <https://pypi.python.org/pypi/snakebite/>
 
-The quickest way to install snakebite (1.3.x) is to run:
-
-`pip install -I snakebite==1.3.x`
-
-To install snakebite 2.x run:
+To install snakebite run:
 
 `pip install snakebite`
 
@@ -42,17 +38,24 @@ run:
 
 `pip install "snakebite[kerberos]"`
 
+Since the older version of snakebite (1.3.x) supports Hadoop 1.0 (instead of Hadoop 2), you
+might want to install an older version by running:
+
+`pip install -I snakebite==1.3.x`
+
+Note that the 1.3 branch is unmaintained and doesn't include any of the fixes in the 2.x branch.
+
 Documentation
 =============
 
-More information and documentation can be found at http://snakebite.readthedocs.org/en/latest/
+More information and documentation can be found at https://snakebite.readthedocs.io/en/latest/
 
 Development
 ===========
 
 Make sure to read about development
-[here](http://snakebite.readthedocs.org/en/latest/development.html) and about
-testing over [here](http://snakebite.readthedocs.org/en/latest/testing.html),
+[here](https://snakebite.readthedocs.io/en/latest/development.html) and about
+testing over [here](https://snakebite.readthedocs.io/en/latest/testing.html),
 hack and come back with a pull requests &lt;3
 
 Travis CI status: [![Travis](https://api.travis-ci.org/spotify/snakebite.png)](https://travis-ci.org/spotify/snakebite)
