@@ -1,4 +1,14 @@
-![Snakebite mini logo](https://github.com/spotify/snakebite/blob/master/doc/logo/logo-mini-typo.png)
+🐍 About This Fork🍴
+--------------------
+This is a fork of https://github.com/spotify/snakebite, via
+https://github.com/kirklg/snakebite/tree/feature/python3. We maintain it
+enough to work for our needs at the Internet Archive. As of April 10 2019,
+some tests are not passing, and we don't have resources to spend fixing
+them. We use the library with our CDH5 cluster and have not tested it with
+any other versions of hadoop. Please help us improve this! Or make your own
+fork. No hard feelings.
+
+![Snakebite mini logo](https://github.com/internetarchive/snakebite-py3/blob/master/doc/logo/logo-mini-typo.png)
 ---
 
 Snakebite is a python library that provides a pure python HDFS client
@@ -12,7 +22,7 @@ the CRC during transfer, but this is disabled by default because of
 performance reasons. This is the opposite behaviour from the stock
 Hadoop client.
 
-Snakebite requires python2 (python3 is not supported yet) and
+~Snakebite requires python2 (python3 is not supported yet)~ and
 python-protobuf 2.4.1 or higher.
 
 Snakebite 1.3.x has been tested mainly against Cloudera CDH4.1.3 (hadoop
@@ -25,40 +35,24 @@ ONLY supports Hadoop 2.2.0 and up (protocol version 9)!
 Installing
 ==========
 
-Snakebite releases are available through pypi at
-<https://pypi.python.org/pypi/snakebite/>
+Snakebite-py3 releases will be available through pypi at
+<https://pypi.python.org/pypi/snakebite-py3/>
 
 To install snakebite run:
 
-`pip install snakebite`
-
-To install snakebite 2.x with Kerberos/SASL support, make sure you can
-install python-krbV (<https://fedorahosted.org/python-krbV/>) and then
-run:
-
-`pip install "snakebite[kerberos]"`
-
-Since the older version of snakebite (1.3.x) supports Hadoop 1.0 (instead of Hadoop 2), you
-might want to install an older version by running:
-
-`pip install -I snakebite==1.3.x`
-
-Note that the 1.3 branch is unmaintained and doesn't include any of the fixes in the 2.x branch.
+`pip install snakebite-py3`
 
 Documentation
 =============
 
-More information and documentation can be found at https://snakebite.readthedocs.io/en/latest/
+More information and documentation can be found at
+https://snakebite.readthedocs.io/en/latest/
 
 Development
 ===========
 
-Make sure to read about development
-[here](https://snakebite.readthedocs.io/en/latest/development.html) and about
-testing over [here](https://snakebite.readthedocs.io/en/latest/testing.html),
-hack and come back with a pull requests &lt;3
-
-Travis CI status: [![Travis](https://api.travis-ci.org/spotify/snakebite.png)](https://travis-ci.org/spotify/snakebite)
+Travis CI status: [![Travis](https://travis-ci.org/internetarchive/snakebite-py3.svg?branch=master)](https://travis-ci.org/internetarchive/snakebite-py3)
 [![Join the chat at https://gitter.im/spotify/snakebite](https://badges.gitter.im/spotify/snakebite.svg)](https://gitter.im/spotify/snakebite?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Copyright 2013-2016 Spotify AB
+Copyright 2016-2019 Internet Archive and individual contributors
