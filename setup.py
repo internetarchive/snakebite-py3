@@ -62,7 +62,7 @@ setup(
     author_email='wouter@spotify.com',
     description='Pure Python HDFS client',
     long_description=open(os.path.join(
-        os.path.dirname(__file__), 'README.md')).read(),
+        os.path.dirname(__file__), 'README.md'), encoding='UTF-8').read(),
     long_description_content_type='text/markdown',
     url='http://github.com/internetarchive/snakebite-py3',
     packages=['snakebite', 'snakebite.protobuf'],
