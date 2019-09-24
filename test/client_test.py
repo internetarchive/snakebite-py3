@@ -63,7 +63,7 @@ class ClientTest(unittest2.TestCase):
         self.assertRaises(OutOfNNException, all, cat_result_gen)
 
     def test_wrapped_methods(self):
-        public_methods = [(name, method) for name, method in inspect.getmembers(HAClient, inspect.ismethod) if not name.startswith("_")]
+        public_methods = [(name, method) for name, method in inspect.getmembers(HAClient, inspect.isfunction) if not name.startswith("_")]
         self.assertGreater(len(public_methods), 0)
         wrapped_methods = [str(method) for name, method in public_methods if ".wrapped" in str(method)]
         self.assertEqual(len(public_methods), len(wrapped_methods))
