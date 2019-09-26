@@ -1383,7 +1383,7 @@ class HAClient(Client):
     @classmethod
     def _wrap_methods(cls):
         # Add HA support to all public Client methods, but only do this when we haven't done this before
-        for name, meth in inspect.getmembers(cls, inspect.ismethod):
+        for name, meth in inspect.getmembers(cls, inspect.isfunction):
             if not name.startswith("_"): # Only public methods
                 if inspect.isgeneratorfunction(meth):
                     setattr(cls, name, cls._ha_gen_method(meth))
