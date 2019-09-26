@@ -1117,7 +1117,7 @@ class CommandLineParserInternalConfigTest(unittest2.TestCase):
 class CommandLineParserExecuteTest(unittest2.TestCase):
     def test_execute_does_not_swallow_tracebacks(self):
         with patch.dict(Commands.methods, clear=True):
-            @CommandLineParser.command.im_func()
+            @CommandLineParser.command()
             def boom(*args, **kwargs):
                 def subboom():
                     raise IndexError("Boom!")
