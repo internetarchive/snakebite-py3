@@ -1116,7 +1116,7 @@ class Client(object):
         response = self.service.getBlockLocations(request)
 
         if response.locations.fileLength == 0:  # Can't read empty file
-            yield ""
+            yield b""
         lastblock = response.locations.lastBlock
 
         if tail_only:
