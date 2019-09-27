@@ -1,12 +1,10 @@
 🐍 About This Fork🍴
 --------------------
 This is a fork of https://github.com/spotify/snakebite, via
-https://github.com/kirklg/snakebite/tree/feature/python3. We maintain it
-enough to work for our needs at the Internet Archive. As of April 10 2019,
-some tests are not passing, and we don't have resources to spend fixing
-them. We use the library with our CDH5 cluster and have not tested it with
-any other versions of hadoop. Please help us improve this! Or make your own
-fork. No hard feelings.
+https://github.com/kirklg/snakebite/tree/feature/python3. We maintain it enough
+to work for our needs at the Internet Archive. We use the library with our CDH5
+cluster and have not tested it with any other versions of hadoop. Please help
+us improve this! Or make your own fork. No hard feelings.
 
 ![Snakebite mini logo](https://github.com/internetarchive/snakebite-py3/blob/master/doc/logo/logo-mini-typo.png)
 ---
