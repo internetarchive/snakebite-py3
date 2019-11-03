@@ -114,7 +114,7 @@ class SaslRpcClient:
             initiate.token = initial_response
 
             for auth in res.auths:
-                if auth.mechanism == chosen_mech:
+                if auth.mechanism == chosen_mech.decode():
                     auth_method = initiate.auths.add()
                     auth_method.mechanism = chosen_mech
                     auth_method.method = auth.method
