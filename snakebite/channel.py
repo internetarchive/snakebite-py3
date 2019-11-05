@@ -193,7 +193,7 @@ class SocketRpcChannel(RpcChannel):
                 raise FatalException("Kerberos libs not found. Please install snakebite using 'pip install snakebite[kerberos]'")
 
             kerberos = Kerberos()
-            self.effective_user = effective_user or kerberos.user_principal().name
+            self.effective_user = effective_user or kerberos.user_principal()
         else: 
             self.effective_user = effective_user or get_current_username()
         self.sock_connect_timeout = sock_connect_timeout

@@ -47,7 +47,7 @@ install_requires = [
 
 extras_require = {
     'kerberos': [
-        'python-krbV',
+        'gssapi',
         'sasl']
 }
 
