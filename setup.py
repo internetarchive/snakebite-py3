@@ -48,7 +48,7 @@ install_requires = [
 extras_require = {
     'kerberos': [
         'gssapi',
-        'sasl']
+        'pure-sasl']
 }
 
 tests_require = [

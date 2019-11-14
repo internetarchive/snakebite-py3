@@ -247,8 +247,8 @@ class SocketRpcChannel(RpcChannel):
             self.write(struct.pack('B', self.AUTH_PROTOCOL_NONE))   # serialization type (protobuf = 0)
 
         if self.use_sasl:
-            sasl = SaslRpcClient(self, hdfs_namenode_principal=self.hdfs_namenode_principal)
-            sasl_connected = sasl.connect()
+            self.sasl = SaslRpcClient(self, hdfs_namenode_principal=self.hdfs_namenode_principal)
+            sasl_connected = self.sasl.connect()
             if not sasl_connected:
                 raise TransientException("SASL is configured, but cannot get connected")
 
@@ -340,11 +340,19 @@ class SocketRpcChannel(RpcChannel):
 
         if log.getEffectiveLevel() == logging.DEBUG:
             log.debug("RPC message length: %s (%s)" % (rpc_message_length, format_bytes(struct.pack('!I', rpc_message_length))))
-        self.write(struct.pack('!I', rpc_message_length))
 
-        self.write_delimited(rpc_request_header)
-        self.write_delimited(request_header)
-        self.write_delimited(param)
+        if self.use_sasl and self.sasl.use_wrap():
+            log.debug("SASL QOP requested, wrapping RPC message.")
+            self.sasl.wrap(
+                struct.pack('!I', rpc_message_length) +
+                encoder._VarintBytes(len(rpc_request_header)) + rpc_request_header +
+                encoder._VarintBytes(len(request_header)) + request_header +
+                encoder._VarintBytes(len(param)) + param)
+        else:
+            self.write(struct.pack('!I', rpc_message_length))
+            self.write_delimited(rpc_request_header)
+            self.write_delimited(request_header)
+            self.write_delimited(param)
 
     def create_request_header(self, method):
         header = RequestHeaderProto()
@@ -420,6 +428,42 @@ class SocketRpcChannel(RpcChannel):
         else:
             self.handle_error(header)
 
+    def unwrap_response(self, response_bytes, response_class):
+        '''Parse a Hadoop RPC response from a byte array.
+
+        This is useful when SASL QOP is requested and the Hadoop RPC
+        response is wrapped/encrypted in a SASL RPC message.
+        '''
+
+        # Read the first 4 bytes to get the total length
+        len_bytes = response_bytes[:4]
+        total_length = struct.unpack("!I", len_bytes)[0]
+        log.debug("Total response length: %s" % total_length)
+        # Read the next 4 bytes to get the length of
+        # the RPC Response header.
+        # Caveat: the value can take up to 4 bytes, but usually
+        # it may be less.
+        (header_length, pos) = decoder._DecodeVarint32(response_bytes[4:8], 0)
+        log.debug("Delimited message length (pos %d): %d" % (pos, header_length))
+        current = 4 + pos
+        header = RpcResponseHeaderProto()
+        header.ParseFromString(response_bytes[current:current+header_length])
+        log_protobuf_message("RpcResponseHeaderProto", header)
+        current += header_length
+        # Read the next 4 bytes to get the length of the RPC Response body.
+        # Caveat: the value can take up to 4 bytes, but usually
+        # it may be less.
+        (msg_length, pos2) = decoder._DecodeVarint32(response_bytes[current:current+4], 0)
+        log.debug("Delimited message length (pos %d): %d" % (pos2, msg_length))
+        response = response_class()
+        current += pos2
+        response.ParseFromString(response_bytes[current:])
+        if log.getEffectiveLevel() == logging.DEBUG:
+            log_protobuf_message("Response", response)
+        return response
+
+
+
     def handle_error(self, header):
         raise RequestError("\n".join([header.exceptionClassName, header.errorMsg]))
 
@@ -445,9 +489,13 @@ class SocketRpcChannel(RpcChannel):
                 self.get_connection(self.host, self.port)
 
             self.send_rpc_message(method, request)
-
-            byte_stream = self.recv_rpc_message()
-            return self.parse_response(byte_stream, response_class)
+            if self.use_sasl and self.sasl.use_wrap():
+                log.debug("SASL QOP requested, unwrapping RPC message.")
+                response_bytes = self.sasl.unwrap()
+                return self.unwrap_response(response_bytes, response_class)
+            else:
+                byte_stream = self.recv_rpc_message()
+                return self.parse_response(byte_stream, response_class)
         except RequestError:  # Raise a request error, but don't close the socket
             raise
         except Exception:  # All other errors close the socket

@@ -34,7 +34,6 @@ Bolke de Bruin (bolke@xs4all.nl)
 from __future__ import absolute_import, print_function, division
 
 import struct
-import sasl
 import re
 
 from snakebite.protobuf.RpcHeader_pb2 import RpcRequestHeaderProto, RpcResponseHeaderProto, RpcSaslProto
@@ -42,6 +41,7 @@ from snakebite.config import HDFSConfig
 from snakebite import logger
 
 import google.protobuf.internal.encoder as encoder
+from puresasl.client import SASLClient
 
 # Configure package logging
 log = logger.getLogger(__name__)
@@ -51,9 +51,7 @@ def log_protobuf_message(header, message):
 
 class SaslRpcClient:
     def __init__(self, trans, hdfs_namenode_principal=None):
-        #self.sasl_client_factory = sasl_client_factory
         self.sasl = None
-        #self.mechanism = mechanism
         self._trans = trans
         self.hdfs_namenode_principal = hdfs_namenode_principal
 
@@ -86,14 +84,12 @@ class SaslRpcClient:
         # use service name component from principal
         service = re.split('[\/@]', str(self.hdfs_namenode_principal))[0]
 
+        if not self.sasl:
+            self.sasl = SASLClient(self._trans.host, service)
+
         negotiate = RpcSaslProto()
         negotiate.state = 1
         self._send_sasl_message(negotiate)
-
-        self.sasl = sasl.Client()
-        self.sasl.setAttr("service", service)
-        self.sasl.setAttr("host", self._trans.host)
-        self.sasl.init()
 
         # do while true
         while True:
@@ -105,18 +101,17 @@ class SaslRpcClient:
                 mechs.append(auth.mechanism)
 
             log.debug("Available mechs: %s" % (",".join(mechs)))
-            s_mechs = str(",".join(mechs))
-            ret, chosen_mech, initial_response = self.sasl.start(s_mechs)
-            log.debug("Chosen mech: %s" % chosen_mech)
+            self.sasl.choose_mechanism(mechs, allow_anonymous=False)
+            log.debug("Chosen mech: %s" % self.sasl.mechanism)
 
             initiate = RpcSaslProto()
             initiate.state = 2
-            initiate.token = initial_response
+            initiate.token = self.sasl.process()
 
             for auth in res.auths:
-                if auth.mechanism == chosen_mech.decode():
+                if auth.mechanism == self.sasl.mechanism:
                     auth_method = initiate.auths.add()
-                    auth_method.mechanism = chosen_mech
+                    auth_method.mechanism = self.sasl.mechanism
                     auth_method.method = auth.method
                     auth_method.protocol = auth.protocol
                     auth_method.serverId = self._trans.host
@@ -136,16 +131,10 @@ class SaslRpcClient:
             return True
 
     def _evaluate_token(self, sasl_response):
-        ret, response = self.sasl.step(sasl_response.token)
-        if not ret:
-          raise Exception("Bad SASL results: %s" % (self.sasl.getError()))
-
-        return response 
+        return self.sasl.process(challenge=sasl_response.token)
 
     def wrap(self, message):
-        ret, encoded = self.sasl.encode(message)
-        if not ret:
-            raise Exception("Cannot encode message: %s" % (self.sasl.getError()))
+        encoded = self.sasl.wrap(message)
 
         sasl_message = RpcSaslProto()
         sasl_message.state = 5 #  WRAP
@@ -158,18 +147,12 @@ class SaslRpcClient:
         if response.state != 5:
             raise Exception("Server send non-wrapped response")
 
-        ret, decoded = self.sasl.decode(response.token)
-        if not ret:
-            raise Exception("Cannot decode message: %s" % (self.sasl.getError()))
-
-        return response
+        return self.sasl.unwrap(response.token)
 
     def use_wrap(self):
         # SASL wrapping is only used if the connection has a QOP, and
         # the value is not auth.  ex. auth-int & auth-priv
-        ret, use_wrap = self.sasl.getSSF()
-        if not ret:
-            raise Exception("Cannot get negotiated security: %s" % (self.sasl.getError()))
-
-        return use_wrap
+        if self.sasl.qop.decode() == 'auth-int' or self.sasl.qop.decode() == 'auth-conf':
+            return True
+        return False
 
