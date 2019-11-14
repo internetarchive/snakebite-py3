@@ -19,26 +19,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 '''
-kerberos.py - A very light wrapper around krbV
+kerberos.py - A very light wrapper around gssapi
 
 This package contains a class to read a kerberos principal
 
-May 2015
+May 2015 (original implementation with krbV)
 
 Bolke de Bruin (bolke@xs4all.nl)
+
+Nov 2019 (implementation with gssapi for Python3)
+
+Luca Toscano (toscano.luca@gmail.com)
 
 '''
 
 # python 3 support
 from __future__ import absolute_import, print_function, division
 
-import krbV
+import gssapi
 
 class Kerberos:
     def __init__(self):
-        self.ctx = krbV.default_context()
-        self.ccache = self.ctx.default_ccache()
+        self.credentials = gssapi.Credentials(usage='initiate')
 
     def user_principal(self):
-        return self.ccache.principal()
+        return str(self.credentials.inquire().name)
 
