@@ -1523,6 +1523,11 @@ class HAClient(Client):
         else:
             raise
 
+    def __handle_index_error(self, exception):
+        log.debug("Request failed with %s" % exception)
+        # IndexError is raised when a NameNode is standby, so failover to another NN
+        next(self.namenode)
+
     @staticmethod
     def _ha_return_method(func):
         ''' Method decorator for 'return type' methods '''
@@ -1551,6 +1556,8 @@ class HAClient(Client):
                     self.__handle_request_error(e)
                 except socket.error as e:
                     self.__handle_socket_error(e)
+                except IndexError as e:
+                    self.__handle_index_error(e)
         return wrapped
 
 HAClient._wrap_methods()
