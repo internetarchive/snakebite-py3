@@ -812,7 +812,10 @@ class Client(object):
             for item in self._find_items([path], processor, include_toplevel=True, recurse=False, include_children=True):
                 for load in item:
                     if load['result']:
-                        f.write(load['response'])
+                        response = load['response']
+                        if type(response) == str:
+                            response = response.encode('utf8')
+                        f.write(response)
                     elif not load['error'] is '':
                         if os.path.isfile(temporary_target):
                             os.remove(temporary_target)
