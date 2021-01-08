@@ -1545,8 +1545,8 @@ class HAClient(Client):
             while(True): # switch between all namenodes
                 try:
                     results = func(self, *args, **kw)
-                    while(True): # yield all results
-                        yield next(results)
+                    yield from results
+                    break
                 except RequestError as e:
                     self.__handle_request_error(e)
                 except socket.error as e:
