@@ -7,14 +7,13 @@ python:
 - 3.9
 jobs:
   allow_failures:
-    - python: 
-      - "3.8"
-      - "3.9"
+    python: 
+    - "3.8"
+    - "3.9"
 jdk: oraclejdk7
 sudo: false
 branches:
   except:
     - gh-pages
 script:
-  - tox --version
   - python setup.py test
