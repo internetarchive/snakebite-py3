@@ -1,15 +1,14 @@
 language: python
-python: 3.4
-jdk: oraclejdk7
+python:
+- 3.5
+- 3.6
+- 3.7
+- 3.8
+- 3.9
 sudo: false
 branches:
   except:
     - gh-pages
-env:
-  - TOX_ENV=py34-cdh
-  - TOX_ENV=py34-hdp
-install:
-  - pip install tox
 script:
-  - tox --version
-  - python setup.py test --tox-args="-e $TOX_ENV"
+  - pip install -r requirements-dev.txt
+  - nosetests -v
