@@ -6,8 +6,8 @@ python:
 - 3.8
 - 3.9
 env:
-- HADOOP_DISTRO=cdh
-- HADOOP_DISTRO=hdp
+- HADOOP_DISTRO=cdh HADOOP_HOME=/tmp/hadoop-cdn
+- HADOOP_DISTRO=hdp HADOOP_HOME=/tmp/hadoop-hdp
 sudo: false
 branches:
   except:
