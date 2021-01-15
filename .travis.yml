@@ -14,4 +14,5 @@ branches:
     - gh-pages
 script:
   - pip install -r requirements-dev.txt
+  - scripts/ci/setup_env.sh
   - nosetests -v
