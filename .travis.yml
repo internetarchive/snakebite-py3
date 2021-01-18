@@ -1,19 +1,33 @@
 language: python
 python:
+- 3.4
+  env:
+  - TOX_ENV=py34-cdh
+  - TOX_ENV=py34-hdp
 - 3.5
+  env:
+  - TOX_ENV=py35-cdh
+  - TOX_ENV=py35-hdp
 - 3.6
-- 3.7
+  env:
+  - TOX_ENV=py36-cdh
+  - TOX_ENV=py36-hdp
 - 3.8
-- 3.9
+  env:
+  - TOX_ENV=py38-cdh
+  - TOX_ENV=py38-hdp
 jobs:
   allow_failures:
-    python: 
+    python:
+    - "3.4"
     - "3.8"
-    - "3.9"
 jdk: oraclejdk7
 sudo: false
 branches:
   except:
     - gh-pages
+install:
+  - pip install tox
 script:
-  - python setup.py test
+  - tox --version
+  - python setup.py test  --tox-args="-e $TOX_ENV"
