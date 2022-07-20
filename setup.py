@@ -42,7 +42,7 @@ class Tox(TestCommand):
         sys.exit(errno)
 
 install_requires = [
-    'protobuf>2.4.1',
+    'protobuf>2.4.1,<4',
     'argparse']
 
 extras_require = {
