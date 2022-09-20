@@ -90,19 +90,15 @@ def format_listing(listing, json_output=False, human_readable=False, recursive=F
     else:
         nodes = []
         last_dir = None
-        try:
-            while True:
-                node = next(listing)
-                dir_name = os.path.dirname(node['path'])
-                if dir_name != last_dir:
-                    if last_dir:
-                        yield _create_dir_listing(nodes, human_readable, recursive, summary)
-                    last_dir = dir_name
-                    nodes = []
-                nodes.append(node)
-
-        except StopIteration:
-            yield _create_dir_listing(nodes, human_readable, recursive, summary)
+        for node in listing:
+            dir_name = os.path.dirname(node['path'])
+            if dir_name != last_dir:
+                if last_dir:
+                    yield _create_dir_listing(nodes, human_readable, recursive, summary)
+                last_dir = dir_name
+                nodes = []
+            nodes.append(node)
+        yield _create_dir_listing(nodes, human_readable, recursive, summary)
 
 
 def _create_dir_listing(nodes, human_readable, recursive, summary):

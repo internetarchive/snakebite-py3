@@ -1,9 +1,9 @@
 -r requirements.txt
 nose
 unittest2
-mock
+mock<4
 virtualenv>=1.11.2
 tox>=1.8.0
-sphinx
+sphinx<2
 sphinx_rtd_theme
 fig
