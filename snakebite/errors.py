@@ -73,6 +73,10 @@ class OutOfNNException(TransientException):
         super(OutOfNNException, self).__init__(msg)
 
 
+class SnapshotException(FatalException):
+    pass
+
+
 class RequestError(TransientException):
     """
     Note: request error could be transient and could be fatal, depending on underlying error.

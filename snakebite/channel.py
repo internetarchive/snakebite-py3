@@ -57,7 +57,7 @@ from snakebite.protobuf.datatransfer_pb2 import OpReadBlockProto, BlockOpRespons
 
 from snakebite.platformutils import get_current_username
 from snakebite.formatter import format_bytes
-from snakebite.errors import RequestError, TransientException, FatalException
+from snakebite.errors import RequestError, TransientException, FatalException, SnapshotException
 from snakebite.crc32c import crc
 from snakebite.compat import range, py_2
 from snakebite import logger
@@ -465,7 +465,13 @@ class SocketRpcChannel(RpcChannel):
 
 
     def handle_error(self, header):
-        raise RequestError("\n".join([header.exceptionClassName, header.errorMsg]))
+        # TODO: one should handle the SnapshotException in the service
+        # code, but it needs refactoring RequestError, as it keeps
+        # data in the string.
+        if header.exceptionClassName.endswith('SnapshotException'):
+            raise SnapshotException(header.errorMsg)
+        else:
+            raise RequestError("\n".join([header.exceptionClassName, header.errorMsg]))
 
     def close_socket(self):
         '''Closes the socket and resets the channel.'''
