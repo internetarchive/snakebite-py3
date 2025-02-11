@@ -56,7 +56,7 @@ tests_require = [
     'virtualenv>=1.11.2']
 
 setup(
-    name='snakebite-py3',
+    name='snakebite-py3-custom',
     version=version(),
     author=u'Wouter de Bie',
     author_email='wouter@spotify.com',
