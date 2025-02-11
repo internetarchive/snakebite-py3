@@ -176,7 +176,8 @@ class Client(object):
                 yield item
 
     LISTING_ATTRIBUTES = ['length', 'owner', 'group', 'block_replication',
-                          'modification_time', 'access_time', 'blocksize']
+                          'modification_time', 'access_time', 'blocksize',
+                          'fileId', 'childrenNum']
 
     def _handle_ls(self, path, node):
         ''' Handle every node received for an ls request'''
