@@ -1170,6 +1170,7 @@ class Client(object):
                         if not location.id.storageID in failed_nodes:
                             failed_nodes.append(location.id.storageID)
                         successful_read = False
+                        break
                 else:
                     raise ConnectionFailureException(
                         u"Failure to connect to data node at ({}:{})".format(
