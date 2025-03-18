@@ -1059,6 +1059,113 @@ class Client(object):
         # return a copy, so if the user changes any values, they won't be saved in the client
         return self._server_defaults.copy()
 
+    def createSnapshot(self, path, snapshot):
+        ''' Create snapshot for the path.
+
+        :param path: The paths
+        :type path: string
+        :param snapshot: snapshot name
+        :type snapshot: string
+        :returns: a generator that yields dictionaries
+        '''
+        if not isinstance(path, unicode):
+            raise InvalidInputException("path should be a string")
+        if not snapshot:
+            raise InvalidInputException("snapshot: no snapshot name given")
+
+        processor = lambda path, node, snapshot=snapshot: self._handle_create_snapshot(path, snapshot)
+        for item in self._find_items([path], processor, include_toplevel=True,
+                                     include_children=False, recurse=False):
+            if item:
+                yield item
+
+    def _handle_create_snapshot(self, path, snapshot):
+        request = client_proto.CreateSnapshotRequestProto()
+        request.snapshotRoot = path
+        request.snapshotName = snapshot
+        response = self.service.createSnapshot(request)
+        return {
+            "result": True,
+            "result_path": response.snapshotPath,
+            "snapshot": snapshot,
+            "path": path,
+        }
+
+    def deleteSnapshot(self, path, snapshot):
+        ''' Delete snapshot for the path.
+
+        :param path: The path
+        :type path: string
+        :param snapshot: snapshot name
+        :type snapshot: string
+        :returns: a generator that yields dictionaries
+        '''
+        if not isinstance(path, unicode):
+            raise InvalidInputException("path should be a string")
+        if not snapshot:
+            raise InvalidInputException("snapshot: no snapshot name given")
+
+        processor = lambda path, node, snapshot=snapshot: self._handle_delete_snapshot(path, snapshot)
+        for item in self._find_items([path], processor, include_toplevel=True,
+                                     include_children=False, recurse=False):
+            if item:
+                yield item
+
+    def _handle_delete_snapshot(self, path, snapshot):
+        request = client_proto.DeleteSnapshotRequestProto()
+        request.snapshotRoot = path
+        request.snapshotName = snapshot
+        self.service.deleteSnapshot(request)
+        return {"result": True, "path": path, "snapshot": snapshot}
+
+    def allowSnapshot(self, paths):
+        ''' Allow snapshotting for the path.
+
+        :param paths: The paths list
+        :type paths: list
+        :returns: a generator that yields dictionaries
+        '''
+        if not isinstance(paths, list):
+            raise InvalidInputException("paths should be a list")
+        if not paths:
+            raise InvalidInputException("allowSnapshot: no path given")
+
+        processor = lambda path, node: self._handle_allow_snapshot(path)
+        for item in self._find_items(paths, processor, include_toplevel=True,
+                                     include_children=False, recurse=False):
+            if item:
+                yield item
+
+    def _handle_allow_snapshot(self, path):
+        request = client_proto.AllowSnapshotRequestProto()
+        request.snapshotRoot = path
+        self.service.allowSnapshot(request)
+        return {"result": True, "path": path}
+
+    def disallowSnapshot(self, paths):
+        ''' Disallow snapshotting for the path.
+
+        :param paths: The paths list
+        :type paths: list
+        :returns: a generator that yields dictionaries
+        '''
+        if not isinstance(paths, list):
+            raise InvalidInputException("paths should be a list")
+        if not paths:
+            raise InvalidInputException("disallowSnapshot: no path given")
+
+        processor = lambda path, node: self._handle_disallow_snapshot(path)
+        for item in self._find_items(paths, processor, include_toplevel=True,
+                                     include_children=False, recurse=False):
+            if item:
+                yield item
+
+    def _handle_disallow_snapshot(self, path):
+        request = client_proto.DisallowSnapshotRequestProto()
+        request.snapshotRoot = path
+        self.service.disallowSnapshot(request)
+        return {"result": True, "path": path}
+
     def _is_directory(self, should_check, node):
         if not should_check:
             return True
