@@ -1,2 +1,2 @@
 argparse
-protobuf==3.0.0b2.post2
+protobuf==7.34.0rc1
